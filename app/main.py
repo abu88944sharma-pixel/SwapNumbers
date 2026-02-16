@@ -8,7 +8,7 @@ app = FastAPI(title="Swap Numbers API", version="1.0.0")
 
 @app.get("/")
 def root():
-    return {"message": "Swap Numbers API - use POST /swap"}
+    return {"message": "Swap Numbers of the APIqwerty - use POST /swap"}
 
 
 @app.post("/swap")
