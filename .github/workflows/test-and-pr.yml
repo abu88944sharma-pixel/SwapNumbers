@@ -62,12 +62,23 @@ jobs:
       - name: Create new branch and push
         id: out
         run: |
-          BRANCH="ready/auto-${{ github.run_id }}"
+          N=${{ github.run_number }}
+          case $N in
+            1) NAME="first" ;;   2) NAME="second" ;;  3) NAME="third" ;;
+            4) NAME="fourth" ;;  5) NAME="fifth" ;;   6) NAME="sixth" ;;
+            7) NAME="seventh" ;; 8) NAME="eighth" ;;  9) NAME="ninth" ;;
+            10) NAME="tenth" ;;  11) NAME="eleventh" ;; 12) NAME="twelfth" ;;
+            13) NAME="thirteenth" ;; 14) NAME="fourteenth" ;; 15) NAME="fifteenth" ;;
+            16) NAME="sixteenth" ;; 17) NAME="seventeenth" ;; 18) NAME="eighteenth" ;;
+            19) NAME="nineteenth" ;; 20) NAME="twentieth" ;;
+            *) NAME="branch_$N" ;;
+          esac
+          BRANCH="${NAME}_branch"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git commit --allow-empty -m "CI: tests passed (${{ github.run_id }})"
-          git push -u origin "$BRANCH"
+          git commit --allow-empty -m "CI: tests passed (${{ github.run_number }})"
+          git push -u origin "$BRANCH" --force
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
       - name: Create PR (main → ready branch)
@@ -75,5 +86,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create --base main --head ${{ steps.out.outputs.branch }} \
-            --title "Auto: tests passed (${{ github.run_id }})" \
-            --body "Tests pass. Nayi branch: ${{ steps.out.outputs.branch }}"
+            --title "Auto: tests passed - ${{ steps.out.outputs.branch }}" \
+            --body "Tests pass. Branch: ${{ steps.out.outputs.branch }}"
