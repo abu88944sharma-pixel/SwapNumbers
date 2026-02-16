@@ -21,6 +21,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Generate tests using AI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "⚠️  OPENAI_API_KEY secret set nahi hai. Skipping AI test generation."
+            echo "📝 Manual tests use kiye ja rahe hain."
+          else
+            echo "🤖 AI se tests generate kar raha hoon..."
+            python scripts/generate_tests.py
+          fi
+
       - name: Run tests
         run: PYTHONPATH=. pytest tests/ -v
 

@@ -19,9 +19,17 @@ pytest tests/ -v
 
 Jab bhi tum **push** karoge (GitHub par):
 
-1. **Pehle tests chalenge** – koi error nahi honi chahiye.
-2. **Agar tests pass:**
-   - **Feature branch** par push kiya hai → usi branch ke liye **PR khul jayega** (main ki taraf).
-   - **Main** par push kiya hai → **nayi branch** `ready/auto-<run_id>` banegi, push hogi, aur us branch ke liye **PR** create ho jayega.
+1. **🤖 AI automatically tests generate karega** – codebase analyze karke comprehensive test cases banayega
+2. **✅ Pehle tests chalenge** – koi error nahi honi chahiye
+3. **Agar tests pass:**
+   - **Feature branch** par push kiya hai → usi branch ke liye **PR khul jayega** (main ki taraf)
+   - **Main** par push kiya hai → **nayi branch** (`first_branch`, `second_branch`, etc.) banegi, push hogi, aur us branch ke liye **PR** create ho jayega
 
-Yani: tum (ya AI) bas push karo – testing khud hogi, pass hone par branch/PR flow automatic.
+**Setup (ek baar):**
+1. GitHub repo → **Settings → Secrets and variables → Actions**
+2. **New repository secret** → Name: `OPENAI_API_KEY`, Value: apna OpenAI API key
+3. Done! Ab har push par AI tests generate karega
+
+**Note:** Agar `OPENAI_API_KEY` set nahi hai, to manual tests use honge (backward compatible).
+
+Yani: tum (ya AI) bas push karo – **AI tests generate karega**, testing khud hogi, pass hone par branch/PR flow automatic.
