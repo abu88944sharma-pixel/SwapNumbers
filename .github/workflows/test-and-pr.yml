@@ -1,0 +1,78 @@
+# Push par: pehle test, pass hone par PR (feature branch) ya nayi branch + PR (main)
+name: Test → PR
+
+on:
+  push:
+    branches: ["**"]   # sab branches par push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+  create-pr:
+    needs: test
+    runs-on: ubuntu-latest
+    # Sirf tab chale jab main par push na ho (feature branch par push)
+    if: github.ref != 'refs/heads/main'
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Pull Request (tests passed)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh pr view --base main 2>/dev/null; then
+            echo "PR already exists."
+          else
+            gh pr create --base main --head ${{ github.ref_name }} \
+              --title "Ready to merge (tests passed) - ${{ github.ref_name }}" \
+              --body "Tests pass ho gaye. Is branch ko main mein merge kiya ja sakta hai. Commit: ${{ github.sha }}"
+          fi
+
+  # Jab main par push ho: tests pass → nayi branch bana ke push → PR
+  branch-and-pr-on-main:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create new branch and push
+        id: out
+        run: |
+          BRANCH="ready/auto-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git push -u origin "$BRANCH"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Create PR (main → ready branch)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --base main --head ${{ steps.out.outputs.branch }} \
+            --title "Auto: tests passed (${{ github.run_id }})" \
+            --body "Tests pass. Nayi branch: ${{ steps.out.outputs.branch }}"
