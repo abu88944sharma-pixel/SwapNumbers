@@ -14,4 +14,4 @@ def root():
 @app.post("/swap")
 def swap_numbers(a: int, b: int):
     """Do numbers lo, swap karke return karo."""
-    return {"a": b, "b": a, "message": " successfully"}
+    return {"a": b, "b": a, "message": "Swapped successfully"}
